@@ -112,6 +112,8 @@ Os destinos iniciais são:
 Dentro da grade:
 
 - as quatro setas movem a seleção;
+- fora da edição numérica, `h`, `j`, `k` e `l` equivalem respectivamente às
+  setas esquerda, baixo, cima e direita;
 - a navegação faz wrap horizontal e vertical;
 - `Enter` executa a função selecionada e volta à pilha;
 - `Esc` cancela e retoma a entrada pendente, se houver, ou volta à pilha;

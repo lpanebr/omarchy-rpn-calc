@@ -49,6 +49,7 @@ omarchy-shell shell summon lpanebr.rpn-calc '{}'
 - `p`/`n` percorrem a pilha; `Enter` copia o nível selecionado para o topo.
 - Durante a edição, esquerda/direita movem o cursor. Baixo/cima entram na
   grade de funções; as setas percorrem a grade com wrap e `Enter` executa.
+- Fora da edição numérica, `h/j/k/l` também navegam como esquerda/baixo/cima/direita.
 - `ARG` restaura os operandos da última operação sem remover o resultado.
 - Os botões `÷ × − +` abaixo da grade permitem executar as operações pelo mouse.
 - `Ctrl+c` copia o topo; `Ctrl+v` empilha um número do clipboard e preserva

@@ -143,6 +143,9 @@ FocusScope {
         if (key === Qt.Key_P && !(event.modifiers & (Qt.AltModifier | Qt.MetaModifier))) { browse(1); return }
         if (key === Qt.Key_N && !(event.modifiers & (Qt.AltModifier | Qt.MetaModifier))) { browse(-1); return }
         if (ctrl || (event.modifiers & (Qt.AltModifier | Qt.MetaModifier))) { event.accepted = false; return }
+        var viKeys = { h: Qt.Key_Left, j: Qt.Key_Down, k: Qt.Key_Up, l: Qt.Key_Right }
+        var editingEntry = entry.length > 0 && selectedLevel === 0 && selectedFunction < 0
+        if (!editingEntry && viKeys[event.text] !== undefined) { arrow(viKeys[event.text]); return }
         if ([Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down].indexOf(key) >= 0) { arrow(key); return }
         if (key === Qt.Key_Return || key === Qt.Key_Enter) {
             if (selectedFunction >= 0) run(actions[selectedFunction].name)
@@ -409,7 +412,7 @@ FocusScope {
                 text: "Keyboard help · " + (root.classic ? "Classic" : "Omarchy") + "\n\n"
                     + "0–9 / .     Edit number\nLeft / Right  Move entry cursor\nEnter       Push entry / run selection\n+ − * /     Calculate (push entry first)\n_           Change sign\nBackspace   Erase entry character\nDelete      DROP when not editing\nCtrl+C / V  Copy top / paste new top\n\n"
                     + "p / Ctrl+P  Browse older levels\nn / Ctrl+N  Browse toward top\nEnter       PICK: copy selected level\nClick level Select; click again to PICK\n\n"
-                    + "Up / Down   Enter function grid\nArrow keys  Navigate grid with wrap\nEsc         Clear error, cancel selection,\n            cancel entry, or close panel\n\n"
+                    + "Up / Down   Enter function grid\nArrows / hjkl Navigate grid with wrap\n              (hjkl outside number entry)\nEsc           Clear error, cancel selection,\n              cancel entry, or close panel\n\n"
                     + "sqrt  Square root      pow  Level 2 ^ 1\n1/x   Reciprocal       +/−  Change sign\nARG   Restore last arguments\ndrop  Remove top       swap Exchange top two\nclear Empty stack after confirmation\n\n"
                     + "Esc / ? / click outside closes help."
                 color: root.ink

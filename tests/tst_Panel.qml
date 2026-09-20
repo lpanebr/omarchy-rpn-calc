@@ -82,6 +82,27 @@ Item {
             keyClick(data.key)
             compare(panel.selectedFunction, data.cell)
         }
+        function test_viNavigationOutsideEntry() {
+            keyClick("j")
+            compare(panel.selectedFunction, 0)
+            keyClick("h")
+            compare(panel.selectedFunction, 3)
+            keyClick("k")
+            compare(panel.selectedFunction, 11)
+            keyClick("l")
+            compare(panel.selectedFunction, 8)
+            keyClick("j")
+            compare(panel.selectedFunction, 0)
+
+            keyClick(Qt.Key_Escape)
+            keyClick("1")
+            keyClick("h")
+            keyClick("j")
+            keyClick("k")
+            keyClick("l")
+            compare(panel.entry, "1")
+            compare(panel.selectedFunction, -1)
+        }
         function test_sqrtCommitsEntry() {
             keyClick("9")
             keyClick(Qt.Key_Down)
