@@ -17,8 +17,9 @@ if [[ $wayland_socket != /* ]]; then
     wayland_socket="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/$wayland_socket"
 fi
 mkdir "$smoke_dir/runtime"
+mkdir "$smoke_dir/state"
 chmod 700 "$smoke_dir/runtime"
-XDG_RUNTIME_DIR="$smoke_dir/runtime" WAYLAND_DISPLAY="$wayland_socket" \
+XDG_RUNTIME_DIR="$smoke_dir/runtime" XDG_STATE_HOME="$smoke_dir/state" WAYLAND_DISPLAY="$wayland_socket" \
 QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME= QT_QUICK_BACKEND=software \
     timeout 15s quickshell --no-color -p "$smoke_dir/shell.qml" >"$smoke_dir/log" 2>&1 || {
         cat "$smoke_dir/log"
@@ -26,6 +27,17 @@ QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME= QT_QUICK_BACKEND=software \
     }
 cat "$smoke_dir/log"
 rg -q 'RPN_SMOKE_PASS' "$smoke_dir/log"
+jq -e '.version == 1 and .stack == [42] and .lastArguments == []' \
+    "$smoke_dir/state/omarchy-rpn-calc.json" >/dev/null
 if rg -q '(TypeError|ReferenceError|SyntaxError|Error loading configuration|is not a type|Cannot assign|Unable to assign)' "$smoke_dir/log"; then
     exit 1
 fi
+RPN_SMOKE_RESTORE=1 XDG_RUNTIME_DIR="$smoke_dir/runtime" \
+XDG_STATE_HOME="$smoke_dir/state" WAYLAND_DISPLAY="$wayland_socket" \
+QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME= QT_QUICK_BACKEND=software \
+    timeout 15s quickshell --no-color -p "$smoke_dir/shell.qml" >"$smoke_dir/restore-log" 2>&1 || {
+        cat "$smoke_dir/restore-log"
+        exit 1
+    }
+cat "$smoke_dir/restore-log"
+rg -q 'RPN_RESTORE_PASS' "$smoke_dir/restore-log"

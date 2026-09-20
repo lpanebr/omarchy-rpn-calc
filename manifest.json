@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "lpanebr.rpn-calc",
   "name": "RPN Calculator",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "lpanebr",
   "description": "Keyboard-driven RPN calculator with an optional classic display",
   "kinds": ["bar-widget"],

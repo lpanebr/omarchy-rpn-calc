@@ -265,8 +265,8 @@ tests/
 - `Panel.qml` contém apresentação, teclado, mouse e modos visuais;
 - `BarWidget.qml` integra o painel à barra;
 - nenhuma operação usa `eval` ou executa comandos externos;
-- pilha e entrada permanecem apenas em memória no MVP; a preferência visual é
-  persistida.
+- pilha, argumentos de `ARG` e preferência visual são persistidos; a entrada
+  em edição permanece apenas em memória.
 
 A implementação deve confirmar o manifesto e os componentes disponíveis na
 versão instalada do Omarchy. Arquivos sob `/usr/share/omarchy` servem somente
@@ -277,8 +277,11 @@ de plugins, e aponta para `plugin/BarWidget.qml`.
 
 ## Persistência e clipboard
 
-Persistência da pilha não pertence ao MVP. Fechar apenas o painel preserva a
-pilha durante a sessão do Omarchy Shell; reiniciar o Shell pode limpá-la.
+A pilha e os argumentos memorizados por `ARG` são persistidos em um arquivo
+JSON sob `$XDG_STATE_HOME` (normalmente
+`~/.local/state/omarchy-rpn-calc.json`). Fechar o painel, reiniciar o Shell ou
+atualizar o plugin preserva esses dados. `clear` esvazia e persiste a pilha
+vazia. A entrada em edição, seleção e mensagens de erro não são persistidas.
 
 Copiar e colar fazem parte do MVP:
 
@@ -327,14 +330,13 @@ Copiar e colar fazem parte do MVP:
 - unidades e conversões;
 - variáveis, fórmulas ou linguagem de programação;
 - gráficos;
-- histórico persistente;
+- histórico persistente de operações;
 - sincronização;
 - reprodução completa de uma HP 48GX;
 - execução de expressões por `eval`.
 
 ## Questões para depois do MVP
 
-- persistir a pilha entre reinícios;
 - histórico de operações e undo;
 - funções trigonométricas e logarítmicas;
 - formatos inteiro, hexadecimal e científico;

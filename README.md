@@ -33,6 +33,10 @@ omarchy plugin add https://github.com/lpanebr/omarchy-rpn-calc.git --enable
 The widget is added to the right section of the bar. Click its icon to open or
 close the calculator.
 
+During an interactive installation, Omarchy asks whether to place the widget
+in the left, center, or right section. The manifest suggests right as the
+default; the selected position is saved by Omarchy Shell.
+
 For a local checkout:
 
 ```bash
@@ -83,9 +87,10 @@ shown in scientific notation. A finite mathematical result outside the
 supported range reports `Result Out of Range`; division by zero reports
 `Infinite Result`. Arbitrary-precision decimals are not supported.
 
-The stack remains in memory while the plugin instance is loaded. Closing the
-panel preserves it; restarting Omarchy Shell or reloading the plugin may clear
-it.
+The stack and the arguments used by `ARG` are stored in
+`$XDG_STATE_HOME/omarchy-rpn-calc.json` (normally
+`~/.local/state/omarchy-rpn-calc.json`). Closing the panel, restarting Omarchy
+Shell, and updating the plugin preserve them. Use `CLEAR` to empty the stack.
 
 ## Update and removal
 
@@ -94,9 +99,9 @@ omarchy plugin update lpanebr.rpn-calc
 omarchy plugin remove lpanebr.rpn-calc
 ```
 
-Removing the plugin also removes it from the bar. The plugin does not create
-data files; its appearance preference lives in the widget entry managed by
-Omarchy Shell.
+Removing the plugin also removes it from the bar. To remove its saved stack as
+well, delete `~/.local/state/omarchy-rpn-calc.json`. Its appearance preference
+lives in the widget entry managed by Omarchy Shell.
 
 ## Development
 
