@@ -258,20 +258,31 @@ FocusScope {
         spacing: Style.space(10)
         Item {
             width: parent.width; height: Style.space(42)
-            Column {
+            Row {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: Style.space(1)
+                spacing: Style.space(9)
                 Text {
-                    text: "RPN Calculator"; color: root.ink
-                    font.family: Style.fontFamily; font.pixelSize: Style.font.body
-                }
-                Text {
-                    text: "not for normies"
-                    color: Qt.darker(root.ink, 1.55)
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "󰃬"
+                    color: root.ink
                     font.family: Style.fontFamily
-                    font.pixelSize: Style.font.bodySmall
-                    font.italic: true
+                    font.pixelSize: Style.font.body * 2
+                }
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Style.space(1)
+                    Text {
+                        text: "RPN Calculator"; color: root.ink
+                        font.family: Style.fontFamily; font.pixelSize: Style.font.body
+                    }
+                    Text {
+                        text: "not for normies"
+                        color: Qt.darker(root.ink, 1.55)
+                        font.family: Style.fontFamily
+                        font.pixelSize: Style.font.bodySmall
+                        font.italic: true
+                    }
                 }
             }
             Row {
