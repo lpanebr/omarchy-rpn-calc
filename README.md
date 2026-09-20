@@ -9,6 +9,8 @@ The calculator runs entirely inside Omarchy Shell. It has no external runtime
 dependencies, does not access the network, and never evaluates expressions as
 code.
 
+![RPN Calculator](preview.png)
+
 ## Features
 
 - Four-level display with scrolling for deeper stacks
