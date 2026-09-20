@@ -206,6 +206,51 @@ FocusScope {
         Controls.ToolTip.text: hint
         Controls.ToolTip.delay: 700
     }
+    component HelpSection: Column {
+        required property string title
+        required property var shortcuts
+        width: parent ? parent.width : 0
+        spacing: Style.space(5)
+
+        Text {
+            text: parent.title
+            textFormat: Text.PlainText
+            color: Qt.darker(root.ink, 1.45)
+            font.family: Style.fontFamily
+            font.pixelSize: Style.font.bodySmall
+            font.bold: true
+            font.letterSpacing: 1.2
+        }
+        Repeater {
+            model: parent.shortcuts
+            Row {
+                required property var modelData
+                width: parent.width
+                height: Math.max(shortcutText.implicitHeight, descriptionText.implicitHeight)
+                spacing: Style.space(10)
+                Text {
+                    id: shortcutText
+                    width: Style.space(128)
+                    text: modelData[0]
+                    textFormat: Text.PlainText
+                    color: root.accent
+                    font.family: Style.fontFamily
+                    font.pixelSize: Style.font.bodySmall
+                    font.bold: true
+                }
+                Text {
+                    id: descriptionText
+                    width: parent.width - shortcutText.width - parent.spacing
+                    text: modelData[1]
+                    textFormat: Text.PlainText
+                    color: root.ink
+                    font.family: Style.fontFamily
+                    font.pixelSize: Style.font.bodySmall
+                    wrapMode: Text.WordWrap
+                }
+            }
+        }
+    }
     Column {
         id: body
         x: root.pad; y: root.pad
@@ -404,20 +449,91 @@ FocusScope {
         color: root.classic ? "#30343a" : Color.background
         MouseArea { anchors.fill: parent; onClicked: root.helpOpen = false }
         Flickable {
-            anchors.fill: parent; anchors.margins: root.pad
-            clip: true; contentHeight: helpText.implicitHeight
-            Text {
-                id: helpText
+            anchors.fill: parent
+            anchors.margins: root.pad
+            clip: true
+            contentWidth: width
+            contentHeight: helpColumn.implicitHeight
+            boundsBehavior: Flickable.StopAtBounds
+
+            Column {
+                id: helpColumn
                 width: parent.width
-                text: "Keyboard help · " + (root.classic ? "Classic" : "Omarchy") + "\n\n"
-                    + "0–9 / .     Edit number\nLeft / Right  Move entry cursor\nEnter       Push entry / run selection\n+ − * /     Calculate (push entry first)\n_           Change sign\nBackspace   Erase entry character\nDelete      DROP when not editing\nCtrl+C / V  Copy top / paste new top\n\n"
-                    + "p / Ctrl+P  Browse older levels\nn / Ctrl+N  Browse toward top\nEnter       PICK: copy selected level\nClick level Select; click again to PICK\n\n"
-                    + "Up / Down   Enter function grid\nArrows / hjkl Navigate grid with wrap\n              (hjkl outside number entry)\nEsc           Clear error, cancel selection,\n              cancel entry, or close panel\n\n"
-                    + "sqrt  Square root      pow  Level 2 ^ 1\n1/x   Reciprocal       +/−  Change sign\nARG   Restore last arguments\ndrop  Remove top       swap Exchange top two\nclear Empty stack after confirmation\n\n"
-                    + "Esc / ? / click outside closes help."
-                color: root.ink
-                font.family: Style.fontFamily; font.pixelSize: Style.font.bodySmall
-                wrapMode: Text.Wrap
+                spacing: Style.space(16)
+
+                Item {
+                    width: parent.width
+                    height: Math.max(helpTitle.implicitHeight, modeLabel.implicitHeight)
+                    Text {
+                        id: helpTitle
+                        anchors.left: parent.left
+                        text: "Keyboard help"
+                        color: root.ink
+                        font.family: Style.fontFamily
+                        font.pixelSize: Style.font.body + 2
+                        font.bold: true
+                    }
+                    Text {
+                        id: modeLabel
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: root.classic ? "Classic" : "Omarchy"
+                        color: root.accent
+                        font.family: Style.fontFamily
+                        font.pixelSize: Style.font.bodySmall
+                        font.bold: true
+                    }
+                }
+
+                HelpSection {
+                    title: "ENTRY & OPERATIONS"
+                    shortcuts: [
+                        ["0–9 / .", "edit number"],
+                        ["← / →", "move entry cursor"],
+                        ["Enter", "push entry / run selection"],
+                        ["+ − × ÷", "calculate; push entry first"],
+                        ["_", "change sign"],
+                        ["Backspace", "erase entry character"],
+                        ["Delete", "drop top when not editing"],
+                        ["Ctrl+C / Ctrl+V", "copy top / paste new top"]
+                    ]
+                }
+                HelpSection {
+                    title: "STACK"
+                    shortcuts: [
+                        ["p / Ctrl+P", "browse older levels"],
+                        ["n / Ctrl+N", "browse toward top"],
+                        ["Enter", "PICK selected level"],
+                        ["Click level", "select; click again to PICK"]
+                    ]
+                }
+                HelpSection {
+                    title: "FUNCTION GRID"
+                    shortcuts: [
+                        ["↓ / ↑", "enter at first / last row"],
+                        ["Arrows / hjkl", "navigate with wrap"],
+                        ["Esc", "clear error / cancel / close"]
+                    ]
+                }
+                HelpSection {
+                    title: "FUNCTIONS"
+                    shortcuts: [
+                        ["√x / yˣ", "square root / power"],
+                        ["1/x / +/−", "reciprocal / change sign"],
+                        ["ARG", "restore last arguments"],
+                        ["DROP / SWAP", "remove top / exchange top two"],
+                        ["CLEAR", "empty stack after confirmation"],
+                        ["÷ × − +", "arithmetic operations"]
+                    ]
+                }
+                Text {
+                    width: parent.width
+                    text: "Esc / ? / click outside closes help"
+                    textFormat: Text.PlainText
+                    color: Qt.darker(root.ink, 1.45)
+                    font.family: Style.fontFamily
+                    font.pixelSize: Style.font.bodySmall
+                }
             }
             Controls.ScrollBar.vertical: Controls.ScrollBar {}
         }
