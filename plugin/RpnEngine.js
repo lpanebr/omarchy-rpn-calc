@@ -1,6 +1,6 @@
 // Plain JavaScript shared by QML and the Node test harness. Stack top is last.
 function createState() {
-    return { stack: [], entry: "", cursor: 0, error: null };
+    return { stack: [], entry: "", cursor: 0, error: null, lastArguments: [] };
 }
 
 function clearError(state) {
@@ -59,6 +59,7 @@ function toggleSign(state) {
     }
     if (state.stack.length === 0)
         return fail(state, "+/-", "Too Few Arguments");
+    state.lastArguments = [state.stack[state.stack.length - 1]];
     state.stack[state.stack.length - 1] = -state.stack[state.stack.length - 1];
     return clearError(state);
 }
@@ -88,6 +89,15 @@ function operate(state, name) {
         return toggleSign(state);
     if (name === "1/x")
         name = "reciprocal";
+    if (name === "arg") {
+        if (!commit(state))
+            return false;
+        if (!state.lastArguments || state.lastArguments.length === 0)
+            return fail(state, "ARG", "No Last Arguments");
+        for (var a = 0; a < state.lastArguments.length; a++)
+            state.stack.push(state.lastArguments[a]);
+        return clearError(state);
+    }
     var label = name === "reciprocal" ? "1/x" : name;
     var binary = name === "+" || name === "-" || name === "*" || name === "/" || name === "pow" || name === "swap";
     var unary = name === "sqrt" || name === "reciprocal" || name === "dup" || name === "drop";
@@ -137,6 +147,7 @@ function operate(state, name) {
         return fail(state, label, "Invalid Argument");
     if (!isFinite(result))
         return fail(state, label, "Infinite Result");
+    state.lastArguments = count === 2 ? [y, x] : [x];
     state.stack.splice(length - count, count, result);
     return clearError(state);
 }

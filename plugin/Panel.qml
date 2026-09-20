@@ -27,7 +27,7 @@ FocusScope {
         { name: "pow", label: "yˣ", hint: "Raise level 2 to level 1" },
         { name: "reciprocal", label: "1/x", hint: "Reciprocal" },
         { name: "sign", label: "+/−", hint: "Change sign" },
-        { name: "dup", label: "dup", hint: "Duplicate top" },
+        { name: "arg", label: "arg", hint: "Restore last operation arguments" },
         { name: "drop", label: "drop", hint: "Remove top" },
         { name: "swap", label: "swap", hint: "Exchange top two" },
         { name: "clear", label: "clear", hint: "Clear stack (confirmation required)" }
@@ -339,6 +339,28 @@ FocusScope {
             }
         }
         Row {
+            width: parent.width
+            spacing: Style.space(6)
+            Repeater {
+                model: [
+                    { name: "/", label: "÷", hint: "Divide" },
+                    { name: "*", label: "×", hint: "Multiply" },
+                    { name: "-", label: "−", hint: "Subtract" },
+                    { name: "+", label: "+", hint: "Add" }
+                ]
+                KeyButton {
+                    required property var modelData
+                    required property int index
+                    objectName: "operation_" + modelData.name
+                    width: (body.width - Style.space(18)) / 4
+                    label: modelData.label
+                    hint: modelData.hint
+                    functionKey: true
+                    onTriggered: root.run(modelData.name)
+                }
+            }
+        }
+        Row {
             visible: root.confirmingClear
             width: parent.width; spacing: Style.space(6)
             Text {
@@ -381,7 +403,7 @@ FocusScope {
                     + "0–9 / .     Edit number\nLeft / Right  Move entry cursor\nEnter       Push entry / run selection\n+ − * /     Calculate (push entry first)\n_           Change sign\nBackspace   Erase entry character\nDelete      DROP when not editing\nCtrl+C / V  Copy top / paste new top\n\n"
                     + "p / Ctrl+P  Browse older levels\nn / Ctrl+N  Browse toward top\nEnter       PICK: copy selected level\nClick level Select; click again to PICK\n\n"
                     + "Up / Down   Enter function grid\nArrow keys  Navigate grid with wrap\nEsc         Clear error, cancel selection,\n            cancel entry, or close panel\n\n"
-                    + "sqrt  Square root      pow  Level 2 ^ 1\n1/x   Reciprocal       +/−  Change sign\ndup   Duplicate top    drop Remove top\nswap  Exchange top two\nclear Empty stack after confirmation\n\n"
+                    + "sqrt  Square root      pow  Level 2 ^ 1\n1/x   Reciprocal       +/−  Change sign\nARG   Restore last arguments\ndrop  Remove top       swap Exchange top two\nclear Empty stack after confirmation\n\n"
                     + "Esc / ? / click outside closes help."
                 color: root.ink
                 font.family: Style.fontFamily; font.pixelSize: Style.font.bodySmall

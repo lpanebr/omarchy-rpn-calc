@@ -31,10 +31,11 @@ ShellRoot {
             if (widget.calculatorState.stack.length !== 0)
                 throw new Error("Unexpected initial stack")
             widget.calculatorState.stack.push(42)
+            if (!widget.classic) throw new Error("Classic is not the default appearance")
             widget.toggleAppearance()
-            if (!widget.classic) throw new Error("Appearance did not toggle")
+            if (widget.classic) throw new Error("Appearance did not toggle")
             widget.toggleAppearance()
-            if (widget.classic) throw new Error("Appearance did not restore")
+            if (!widget.classic) throw new Error("Appearance did not restore")
             widget.open()
             if (!widget.opened) throw new Error("Panel did not open")
             phase = 1

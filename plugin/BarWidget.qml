@@ -11,7 +11,7 @@ Ui.BarWidget {
     property var calculatorState: Engine.createState()
     property bool opened: false
     property bool popoutSwitchClosing: false
-    readonly property bool classic: setting("appearance", "Omarchy") === "Classic"
+    readonly property bool classic: setting("appearance", "Classic") === "Classic"
 
     implicitWidth: button.implicitWidth
     implicitHeight: button.implicitHeight

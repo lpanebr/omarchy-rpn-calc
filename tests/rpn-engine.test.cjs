@@ -170,6 +170,32 @@ test('stack operations, pending entry and error clearing', () => {
     assert.equal(state.error, null);
 });
 
+test('ARG restores the last successful operation arguments after its result', () => {
+    const state = values(2, 3);
+    assert.equal(engine.operate(state, '+'), true);
+    assert.deepEqual(stack(state), [5]);
+    assert.equal(engine.operate(state, 'arg'), true);
+    assert.deepEqual(stack(state), [5, 2, 3]);
+    // ARG itself does not replace the remembered arguments.
+    assert.equal(engine.operate(state, 'arg'), true);
+    assert.deepEqual(stack(state), [5, 2, 3, 2, 3]);
+
+    const unary = values(9);
+    engine.operate(unary, 'sqrt');
+    engine.operate(unary, 'arg');
+    assert.deepEqual(stack(unary), [3, 9]);
+
+    const signed = values(4);
+    engine.toggleSign(signed);
+    engine.operate(signed, 'arg');
+    assert.deepEqual(stack(signed), [-4, 4]);
+
+    const empty = engine.createState();
+    assert.equal(engine.operate(empty, 'arg'), false);
+    assert.equal(empty.error.operation, 'ARG');
+    assert.equal(empty.error.message, 'No Last Arguments');
+});
+
 test('Number precision is retained and independent states do not share arrays', () => {
     const first = values(0.1, 0.2);
     engine.operate(first, '+');

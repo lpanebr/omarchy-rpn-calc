@@ -103,6 +103,18 @@ Item {
             compare(toggled.count, 1)
             verify(panel.activeFocus)
         }
+        function test_argAndMouseOperationButtons() {
+            enter("2")
+            enter("3")
+            var addButton = findChild(panel, "operation_+")
+            verify(addButton !== null)
+            mouseClick(addButton, addButton.width / 2, addButton.height / 2)
+            stack([5])
+            keyClick(Qt.Key_Up)
+            compare(panel.selectedFunction, 4)
+            keyClick(Qt.Key_Return)
+            stack([5, 2, 3])
+        }
         function test_browseEscapeAndPickPreserveBuffer() {
             enter("10"); enter("25"); enter("2"); enter("3")
             keySequence("78")

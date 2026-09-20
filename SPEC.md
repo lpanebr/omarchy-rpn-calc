@@ -105,7 +105,7 @@ Os destinos iniciais são:
 | Seta | Durante a entrada | Sem entrada em andamento |
 | --- | --- | --- |
 | Baixo | Primeira coluna, primeira linha (`sqrt`) | Primeira coluna, primeira linha (`sqrt`) |
-| Cima | Primeira coluna, última linha (`dup`) | Primeira coluna, última linha (`dup`) |
+| Cima | Primeira coluna, última linha (`arg`) | Primeira coluna, última linha (`arg`) |
 | Esquerda | Move o cursor para a esquerda | Última coluna, primeira linha (`+/-`) |
 | Direita | Move o cursor para a direita | Primeira coluna, primeira linha (`sqrt`) |
 
@@ -121,10 +121,12 @@ Grade inicial proposta:
 
 ```text
 sqrt   pow    1/x    +/-
-dup    drop   swap   clear
+arg    drop   swap   clear
 ```
 
-As quatro operações não precisam ocupar células porque possuem teclas diretas.
+Uma linha adicional abaixo da grade apresenta, nesta ordem, as operações
+`/`, `*`, `-` e `+`, para uso pelo mouse. Seus atalhos diretos permanecem
+disponíveis.
 Os rótulos e tooltips devem ser em inglês. Símbolos como `√x` e `yˣ` podem ser
 usados quando permanecerem legíveis na fonte ativa.
 
@@ -135,7 +137,9 @@ usados quando permanecerem legíveis na fonte ativa.
 - `1/x`: substitui o nível `1` por seu inverso;
 - `+/-`: troca o sinal da entrada pendente, sem confirmá-la, ou do nível `1`
   quando não há entrada, assim como `_`;
-- `dup`: duplica o nível `1`;
+- `arg`: restaura na pilha os operandos da última operação matemática
+  bem-sucedida, na ordem original, sem remover o resultado e sem substituir os
+  argumentos memorizados. Por exemplo, `2 Enter 3 + ARG` produz `[5, 2, 3]`;
 - `drop`: remove o nível `1`;
 - `swap`: troca os níveis `1` e `2`;
 - `clear`: esvazia a pilha após uma confirmação simples no próprio painel.
@@ -210,12 +214,12 @@ Um toggle retangular no canto superior direito do painel alterna entre
 
 ### Omarchy
 
-Modo padrão, usando cores, tipografia, espaçamento, bordas e componentes do tema
-ativo do Omarchy Shell. Deve parecer parte nativa do sistema.
+Modo alternativo, usando cores, tipografia, espaçamento, bordas e componentes
+do tema ativo do Omarchy Shell. Deve parecer parte nativa do sistema.
 
 ### Classic
 
-Modo opcional inspirado na experiência visual da HP 48GX:
+Modo padrão inspirado na experiência visual da HP 48GX:
 
 - corpo em grafite escuro;
 - display LCD em verde acinzentado, com contraste moderado;
@@ -297,11 +301,14 @@ Copiar e colar fazem parte do MVP:
 - `2 Enter 0 /` preserva `[2, 0]`, com o zero confirmado no nível `1`;
 - navegar pela pilha durante a edição e cancelar retoma o buffer e o cursor;
 - `9` seguido de `sqrt` produz `3`; `+/-` durante a edição não confirma a entrada;
+- `2 Enter 3 + ARG` deixa `[5, 2, 3]` na pilha;
+- os quatro botões `/`, `*`, `-` e `+` aparecem abaixo da grade e funcionam
+  com o mouse;
 - `Esc` limpa um erro antes de cancelar a entrada ou fechar o painel;
 - `Ctrl+c` copia o nível `1` sem truncamento e `Ctrl+v` cola um número finito;
 - valores aparecem alinhados à direita com ponto decimal;
 - `?` apresenta todos os atalhos do MVP;
-- os modos `Omarchy` e `Classic` são legíveis e o modo `Classic` não usa assets
+- os modos `Omarchy` e `Classic` são legíveis, `Classic` é o padrão e não usa assets
   ou marcas da HP;
 - o toggle retangular no canto superior direito alterna a aparência e a escolha
   sobrevive ao reinício do Shell;

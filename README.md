@@ -49,12 +49,14 @@ omarchy-shell shell summon lpanebr.rpn-calc '{}'
 - `p`/`n` percorrem a pilha; `Enter` copia o nível selecionado para o topo.
 - Durante a edição, esquerda/direita movem o cursor. Baixo/cima entram na
   grade de funções; as setas percorrem a grade com wrap e `Enter` executa.
+- `ARG` restaura os operandos da última operação sem remover o resultado.
+- Os botões `÷ × − +` abaixo da grade permitem executar as operações pelo mouse.
 - `Ctrl+c` copia o topo; `Ctrl+v` empilha um número do clipboard e preserva
   qualquer entrada em edição.
 - `?` abre a ajuda. `Esc` dispensa ajuda, erro, seleção ou entrada antes de
   fechar o painel.
-- O toggle no canto superior direito alterna entre `Omarchy` e `Classic` e
-  salva a preferência nas configurações do Shell.
+- O toggle no canto superior direito alterna entre `Classic`, o padrão, e
+  `Omarchy`, salvando a preferência nas configurações do Shell.
 
 A pilha permanece em memória enquanto o widget existir. Fechar o painel não
 a apaga; reiniciar o Shell ou recarregar o plugin pode apagá-la. Os cálculos
