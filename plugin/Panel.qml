@@ -39,6 +39,8 @@ FocusScope {
         { name: "+", label: "+", hint: "Add" }
     ]
     readonly property var actions: functions.concat(operations)
+    readonly property int gridColumns: 4
+    readonly property int gridRows: Math.ceil(actions.length / gridColumns)
     signal stateMutated()
     signal closeRequested()
     signal appearanceToggleRequested()
@@ -98,18 +100,19 @@ FocusScope {
     }
     function arrow(key) {
         if (selectedFunction >= 0) {
-            var col = selectedFunction % 4
-            var row = Math.floor(selectedFunction / 4)
-            if (key === Qt.Key_Left) col = (col + 3) % 4
-            if (key === Qt.Key_Right) col = (col + 1) % 4
-            if (key === Qt.Key_Up) row = (row + 2) % 3
-            if (key === Qt.Key_Down) row = (row + 1) % 3
-            selectedFunction = row * 4 + col
+            var col = selectedFunction % gridColumns
+            var row = Math.floor(selectedFunction / gridColumns)
+            if (key === Qt.Key_Left) col = (col + gridColumns - 1) % gridColumns
+            if (key === Qt.Key_Right) col = (col + 1) % gridColumns
+            if (key === Qt.Key_Up) row = (row + gridRows - 1) % gridRows
+            if (key === Qt.Key_Down) row = (row + 1) % gridRows
+            selectedFunction = row * gridColumns + col
         } else if (entry.length && !selectedLevel && (key === Qt.Key_Left || key === Qt.Key_Right)) {
             Engine.moveCursor(calculatorState, key === Qt.Key_Left ? -1 : 1)
         } else {
             selectedLevel = 0
-            selectedFunction = key === Qt.Key_Up ? 8 : key === Qt.Key_Left ? 3 : 0
+            selectedFunction = key === Qt.Key_Up ? (gridRows - 1) * gridColumns
+                : key === Qt.Key_Left ? gridColumns - 1 : 0
         }
         Engine.clearError(calculatorState)
         refresh()
@@ -331,7 +334,7 @@ FocusScope {
         Grid {
             width: parent.width
             enabled: !root.confirmingClear
-            columns: 4; spacing: Style.space(6)
+            columns: root.gridColumns; spacing: Style.space(6)
             Repeater {
                 model: root.functions
                 KeyButton {
