@@ -1,83 +1,118 @@
-# Omarchy RPN Calculator
+# RPN Calculator for Omarchy
 
-Uma calculadora RPN local para o Omarchy Shell, operável principalmente pelo
-teclado e acessível por um widget na barra.
+A keyboard-first RPN calculator for the Omarchy bar. It provides an unlimited
+stack, editable numeric input, mouse controls, and two visual styles: a
+Classic mode inspired by scientific calculators and a theme-aware Omarchy
+mode.
 
-O painel combina uma pilha ilimitada, entrada numérica direta e uma grade de
-funções navegável. A interface visível é em inglês e pode seguir o tema do
-Omarchy ou usar um modo clássico inspirado no aspecto de uma HP 48GX.
+The calculator runs entirely inside Omarchy Shell. It has no external runtime
+dependencies, does not access the network, and never evaluates expressions as
+code.
 
-Consulte [SPEC.md](SPEC.md) para o comportamento do MVP, os atalhos e a
-proposta visual.
+## Features
 
-## Princípios
+- Four-level display with scrolling for deeper stacks
+- Direct `+`, `-`, `*`, and `/` operations
+- Square root, power, reciprocal, sign, `ARG`, `DROP`, `SWAP`, and `CLEAR`
+- Keyboard navigation with arrow keys or `h`/`j`/`k`/`l`
+- Stack browsing and `PICK`
+- Clipboard copy and paste
+- Classic and Omarchy appearances, with Classic enabled by default
+- Errors preserve their operands
 
-- entrada RPN rápida, sem exigir cliques;
-- pilha numerada como nas calculadoras HP 48;
-- erros não destroem operandos;
-- nenhum uso de `eval` para calcular expressões;
-- funcionamento inteiramente local;
-- visual clássico opcional, sem copiar marca, logotipo ou assets da HP.
+## Requirements
 
-## Instalação
+- Omarchy 4 with shell plugin support
 
-Requer o Omarchy Shell com suporte a plugins `bar-widget`, `Ui.KeyboardPanel`
-e `updateEntryInline`. A integração foi desenvolvida contra o Omarchy
-`4.0.0.alpha` e Quickshell `0.3.1` instalados nesta máquina.
+## Installation
 
-Para instalar uma cópia local do repositório em um destino novo:
+```bash
+omarchy plugin add https://github.com/lpanebr/omarchy-rpn-calc.git --enable
+```
+
+The widget is added to the right section of the bar. Click its icon to open or
+close the calculator.
+
+For a local checkout:
+
+```bash
+omarchy plugin add "$PWD" --enable
+```
+
+## Usage
+
+RPN operations consume the top stack levels. For example:
+
+```text
+2 Enter 3 +       → 5
+2 Enter 3 + 4 *   → 20
+```
+
+An entry is committed automatically before an operation, so `2 Enter 3 +` and
+`2 Enter 3 Enter +` are equivalent.
+
+### Keyboard controls
+
+| Keys | Action |
+| --- | --- |
+| `0`–`9`, `.` | Edit a number |
+| `Left`, `Right` | Move the entry cursor |
+| `Enter` | Push an entry, run a function, or `PICK` a stack level |
+| `+`, `-`, `*`, `/` | Commit the entry and calculate |
+| `_` | Change the sign |
+| `Backspace` | Erase the character before the cursor |
+| `Delete` | Drop the top level when not editing |
+| `p` / `Ctrl+p` | Browse toward older stack levels |
+| `n` / `Ctrl+n` | Browse toward the top level |
+| Arrows or `h`/`j`/`k`/`l` | Navigate the function grid with wrap |
+| `Ctrl+c` / `Ctrl+v` | Copy the top level / paste a new top level |
+| `?` | Open keyboard help |
+| `Esc` | Clear an error, cancel the current state, or close the panel |
+
+`h`/`j`/`k`/`l` are disabled while editing a number. `ARG` restores the
+operands of the last successful mathematical operation without removing its
+result.
+
+## Appearance and numeric behavior
+
+Use the switch in the panel header to select Classic or Omarchy mode. The
+choice is stored in the Omarchy Shell configuration.
+
+Calculations use JavaScript `Number`. Large and small supported values are
+shown in scientific notation. A finite mathematical result outside the
+supported range reports `Result Out of Range`; division by zero reports
+`Infinite Result`. Arbitrary-precision decimals are not supported.
+
+The stack remains in memory while the plugin instance is loaded. Closing the
+panel preserves it; restarting Omarchy Shell or reloading the plugin may clear
+it.
+
+## Update and removal
+
+```bash
+omarchy plugin update lpanebr.rpn-calc
+omarchy plugin remove lpanebr.rpn-calc
+```
+
+Removing the plugin also removes it from the bar. The plugin does not create
+data files; its appearance preference lives in the widget entry managed by
+Omarchy Shell.
+
+## Development
+
+The complete behavior specification is in [SPEC.md](SPEC.md).
 
 ```bash
 omarchy plugin validate .
-mkdir -p ~/.config/omarchy/plugins/lpanebr.rpn-calc
-cp manifest.json ~/.config/omarchy/plugins/lpanebr.rpn-calc/
-cp -R plugin ~/.config/omarchy/plugins/lpanebr.rpn-calc/
-omarchy-shell shell rescanPlugins
-omarchy plugin enable lpanebr.rpn-calc
-```
-
-O widget aparece à direita da barra. Clique no ícone para abrir ou fechar.
-O painel também pode ser aberto pelo IPC do Shell:
-
-```bash
-omarchy-shell shell summon lpanebr.rpn-calc '{}'
-```
-
-## Uso
-
-- Digite `2 Enter 3 +` para obter `5`. `_` troca o sinal.
-- `p`/`n` percorrem a pilha; `Enter` copia o nível selecionado para o topo.
-- Durante a edição, esquerda/direita movem o cursor. Baixo/cima entram na
-  grade de funções; as setas percorrem a grade com wrap e `Enter` executa.
-- Fora da edição numérica, `h/j/k/l` também navegam como esquerda/baixo/cima/direita.
-- `ARG` restaura os operandos da última operação sem remover o resultado.
-- Os botões `÷ × − +` abaixo da grade permitem executar as operações pelo mouse.
-- `Ctrl+c` copia o topo; `Ctrl+v` empilha um número do clipboard e preserva
-  qualquer entrada em edição.
-- `?` abre a ajuda. `Esc` dispensa ajuda, erro, seleção ou entrada antes de
-  fechar o painel.
-- O toggle no canto superior direito alterna entre `Classic`, o padrão, e
-  `Omarchy`, salvando a preferência nas configurações do Shell.
-
-A pilha permanece em memória enquanto o widget existir. Fechar o painel não
-a apaga; reiniciar o Shell ou recarregar o plugin pode apagá-la. Os cálculos
-usam `Number` do JavaScript, com suas limitações de precisão binária.
-
-## Desenvolvimento
-
-O manifesto na raiz aponta para `plugin/BarWidget.qml`. O motor numérico
-independe da interface e não usa `eval`, rede ou processos externos.
-
-```bash
-node --test tests/rpn-engine.test.cjs
+node tests/rpn-engine.test.cjs
 bash tests/run-qml-tests.sh
 bash tests/run-shell-smoke.sh
-omarchy plugin validate .
 ```
 
-Os testes QML usam Qt Quick Test 6 com um tema mínimo de teste. O smoke test
-usa os componentes reais do Omarchy Shell em `/usr/share/omarchy/shell` e
-uma instância separada do Quickshell na sessão Wayland; abre e fecha brevemente
-o painel. Nenhum teste instala o plugin ou altera a configuração da barra.
+The shell smoke test starts a separate temporary Quickshell instance and
+requires an active Wayland session. It does not install the plugin or change
+the bar configuration.
 
-Licença: GPL-2.0-or-later.
+## License
+
+GPL-2.0-or-later
