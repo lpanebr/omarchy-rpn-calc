@@ -4,7 +4,7 @@
   "name": "RPN Calculator",
   "version": "0.3.0",
   "author": "lpanebr",
-  "description": "Keyboard-driven RPN calculator with an optional classic display",
+  "description": "Keyboard-first RPN calculator with a persistent stack and classic display",
   "kinds": ["bar-widget"],
   "entryPoints": { "barWidget": "plugin/BarWidget.qml" },
   "barWidget": {
