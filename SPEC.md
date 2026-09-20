@@ -179,6 +179,10 @@ O MVP deve tratar pelo menos:
 A mensagem permanece até a próxima ação válida ou `Esc`. Os textos concretos
 devem ser curtos, em inglês, e testáveis.
 
+`Infinite Result` é reservado para operações matematicamente infinitas no
+domínio do MVP, como divisão por zero e inverso de zero. Quando um resultado
+finito excede o intervalo de `Number`, a mensagem é `Result Out of Range`.
+
 ## Precisão e formatação
 
 O MVP usa `Number` do JavaScript. Cálculo decimal de precisão arbitrária fica

@@ -55,8 +55,8 @@ test('operation errors preserve operands after confirming entry', () => {
     for (const [op, inputs, message] of [
         ['+', [2], 'Too Few Arguments'], ['sqrt', [-1], 'Invalid Argument'],
         ['reciprocal', [0], 'Infinite Result'], ['/', [0, 0], 'Infinite Result'],
-        ['pow', [-2, 0.5], 'Invalid Argument'], ['pow', [10, 1000], 'Infinite Result'],
-        ['*', [1e308, 10], 'Infinite Result'],
+        ['pow', [-2, 0.5], 'Invalid Argument'], ['pow', [10, 1000], 'Result Out of Range'],
+        ['*', [1e308, 10], 'Result Out of Range'],
     ]) {
         const other = values(...inputs);
         assert.equal(engine.operate(other, op), false);

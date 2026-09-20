@@ -146,7 +146,7 @@ function operate(state, name) {
     if (isNaN(result))
         return fail(state, label, "Invalid Argument");
     if (!isFinite(result))
-        return fail(state, label, "Infinite Result");
+        return fail(state, label, "Result Out of Range");
     state.lastArguments = count === 2 ? [y, x] : [x];
     state.stack.splice(length - count, count, result);
     return clearError(state);
