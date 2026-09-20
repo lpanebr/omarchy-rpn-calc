@@ -105,7 +105,7 @@ Os destinos iniciais são:
 | Seta | Durante a entrada | Sem entrada em andamento |
 | --- | --- | --- |
 | Baixo | Primeira coluna, primeira linha (`sqrt`) | Primeira coluna, primeira linha (`sqrt`) |
-| Cima | Primeira coluna, última linha (`arg`) | Primeira coluna, última linha (`arg`) |
+| Cima | Primeira coluna, última linha (`/`) | Primeira coluna, última linha (`/`) |
 | Esquerda | Move o cursor para a esquerda | Última coluna, primeira linha (`+/-`) |
 | Direita | Move o cursor para a direita | Primeira coluna, primeira linha (`sqrt`) |
 
@@ -124,9 +124,9 @@ sqrt   pow    1/x    +/-
 arg    drop   swap   clear
 ```
 
-Uma linha adicional abaixo da grade apresenta, nesta ordem, as operações
-`/`, `*`, `-` e `+`, para uso pelo mouse. Seus atalhos diretos permanecem
-disponíveis.
+Uma terceira linha apresenta, nesta ordem, as operações `/`, `*`, `-` e `+`.
+Ela integra a navegação por setas e o wrap da grade, além de permitir uso pelo
+mouse. Seus atalhos diretos permanecem disponíveis.
 Os rótulos e tooltips devem ser em inglês. Símbolos como `√x` e `yˣ` podem ser
 usados quando permanecerem legíveis na fonte ativa.
 

@@ -60,9 +60,9 @@ Item {
             keyClick(Qt.Key_Left)
             compare(panel.selectedFunction, 3)
             keyClick(Qt.Key_Up)
-            compare(panel.selectedFunction, 7)
+            compare(panel.selectedFunction, 11)
             keyClick(Qt.Key_Right)
-            compare(panel.selectedFunction, 4)
+            compare(panel.selectedFunction, 8)
             keyClick(Qt.Key_Down)
             compare(panel.selectedFunction, 0)
             keyClick(Qt.Key_Escape)
@@ -75,7 +75,7 @@ Item {
         function test_idleArrowDestinations_data() {
             return [ {tag: "left", key: Qt.Key_Left, cell: 3},
                      {tag: "right", key: Qt.Key_Right, cell: 0},
-                     {tag: "up", key: Qt.Key_Up, cell: 4},
+                     {tag: "up", key: Qt.Key_Up, cell: 8},
                      {tag: "down", key: Qt.Key_Down, cell: 0} ]
         }
         function test_idleArrowDestinations(data) {
@@ -110,7 +110,8 @@ Item {
             verify(addButton !== null)
             mouseClick(addButton, addButton.width / 2, addButton.height / 2)
             stack([5])
-            keyClick(Qt.Key_Up)
+            keyClick(Qt.Key_Down)
+            keyClick(Qt.Key_Down)
             compare(panel.selectedFunction, 4)
             keyClick(Qt.Key_Return)
             stack([5, 2, 3])

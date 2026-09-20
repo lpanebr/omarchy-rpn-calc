@@ -32,6 +32,13 @@ FocusScope {
         { name: "swap", label: "swap", hint: "Exchange top two" },
         { name: "clear", label: "clear", hint: "Clear stack (confirmation required)" }
     ]
+    readonly property var operations: [
+        { name: "/", label: "÷", hint: "Divide" },
+        { name: "*", label: "×", hint: "Multiply" },
+        { name: "-", label: "−", hint: "Subtract" },
+        { name: "+", label: "+", hint: "Add" }
+    ]
+    readonly property var actions: functions.concat(operations)
     signal stateMutated()
     signal closeRequested()
     signal appearanceToggleRequested()
@@ -95,13 +102,14 @@ FocusScope {
             var row = Math.floor(selectedFunction / 4)
             if (key === Qt.Key_Left) col = (col + 3) % 4
             if (key === Qt.Key_Right) col = (col + 1) % 4
-            if (key === Qt.Key_Up || key === Qt.Key_Down) row = 1 - row
+            if (key === Qt.Key_Up) row = (row + 2) % 3
+            if (key === Qt.Key_Down) row = (row + 1) % 3
             selectedFunction = row * 4 + col
         } else if (entry.length && !selectedLevel && (key === Qt.Key_Left || key === Qt.Key_Right)) {
             Engine.moveCursor(calculatorState, key === Qt.Key_Left ? -1 : 1)
         } else {
             selectedLevel = 0
-            selectedFunction = key === Qt.Key_Up ? 4 : key === Qt.Key_Left ? 3 : 0
+            selectedFunction = key === Qt.Key_Up ? 8 : key === Qt.Key_Left ? 3 : 0
         }
         Engine.clearError(calculatorState)
         refresh()
@@ -134,7 +142,7 @@ FocusScope {
         if (ctrl || (event.modifiers & (Qt.AltModifier | Qt.MetaModifier))) { event.accepted = false; return }
         if ([Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down].indexOf(key) >= 0) { arrow(key); return }
         if (key === Qt.Key_Return || key === Qt.Key_Enter) {
-            if (selectedFunction >= 0) run(functions[selectedFunction].name)
+            if (selectedFunction >= 0) run(actions[selectedFunction].name)
             else if (selectedLevel) pick()
             else { Engine.commit(calculatorState); refresh() }
             return
@@ -342,12 +350,7 @@ FocusScope {
             width: parent.width
             spacing: Style.space(6)
             Repeater {
-                model: [
-                    { name: "/", label: "÷", hint: "Divide" },
-                    { name: "*", label: "×", hint: "Multiply" },
-                    { name: "-", label: "−", hint: "Subtract" },
-                    { name: "+", label: "+", hint: "Add" }
-                ]
+                model: root.operations
                 KeyButton {
                     required property var modelData
                     required property int index
@@ -356,6 +359,7 @@ FocusScope {
                     label: modelData.label
                     hint: modelData.hint
                     functionKey: true
+                    selected: root.selectedFunction === index + root.functions.length
                     onTriggered: root.run(modelData.name)
                 }
             }
