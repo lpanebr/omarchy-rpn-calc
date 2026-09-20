@@ -46,13 +46,18 @@ de cor.
 - `0`–`9` iniciam ou continuam a entrada numérica.
 - `.` insere o separador decimal; a interface sempre usa ponto.
 - `_` troca o sinal da entrada ou do nível `1` quando não há entrada.
-- `Backspace` apaga o último caractere durante a entrada.
+- Durante a entrada, esquerda/direita movem o cursor; dígitos e ponto são
+  inseridos na posição do cursor.
+- `Backspace` apaga o caractere anterior ao cursor durante a entrada.
 - `Enter` confirma a entrada e a coloca no nível `1`.
 - `+`, `-`, `*` e `/` confirmam implicitamente uma entrada pendente e executam
   a operação em seguida.
 - `Delete` executa `DROP` quando não há uma entrada em edição.
 - `?` abre a ajuda de atalhos.
-- `Esc` fecha a ajuda, cancela uma seleção ou fecha o painel, conforme o estado.
+- `Ctrl+c` copia o valor do nível `1`; `Ctrl+v` cola um valor no nível `1`.
+- `Esc` fecha a ajuda quando aberta; fora da ajuda, limpa primeiro uma mensagem
+  de erro, se houver. Caso contrário, cancela a seleção ativa, cancela a entrada
+  em edição ou, em idle, fecha o painel. Cada pressionamento trata uma camada.
 
 Exemplo: se `2` já estiver na pilha, digitar `3 +` equivale a `3 Enter +` e
 produz `5`.
@@ -68,6 +73,8 @@ a pilha.
 - `Enter` executa `PICK`: copia o valor selecionado para o novo nível `1`, sem
   remover o original;
 - `Esc` cancela a navegação sem modificar a pilha;
+- navegar durante uma entrada preserva seu buffer e cursor, sem confirmá-la;
+  cancelar a navegação com `Esc` retoma essa edição;
 - digitar um número cancela a navegação e inicia uma nova entrada.
 
 Exemplo de `PICK`:
@@ -91,16 +98,23 @@ Após `Enter`:
 
 ## Grade de funções
 
-Qualquer seta, quando o usuário está na pilha ou editando uma entrada, muda
-automaticamente para a grade de funções. A função inicial é a célula coerente
-com a direção pressionada e com a posição visual mais próxima.
+Durante a entrada, esquerda/direita movem o cursor e não entram na grade.
+As setas para baixo e para cima entram na grade preservando a entrada pendente.
+Os destinos iniciais são:
+
+| Seta | Durante a entrada | Sem entrada em andamento |
+| --- | --- | --- |
+| Baixo | Primeira coluna, primeira linha (`sqrt`) | Primeira coluna, primeira linha (`sqrt`) |
+| Cima | Primeira coluna, última linha (`dup`) | Primeira coluna, última linha (`dup`) |
+| Esquerda | Move o cursor para a esquerda | Última coluna, primeira linha (`+/-`) |
+| Direita | Move o cursor para a direita | Primeira coluna, primeira linha (`sqrt`) |
 
 Dentro da grade:
 
 - as quatro setas movem a seleção;
 - a navegação faz wrap horizontal e vertical;
 - `Enter` executa a função selecionada e volta à pilha;
-- `Esc` cancela e volta à pilha;
+- `Esc` cancela e retoma a entrada pendente, se houver, ou volta à pilha;
 - clicar em uma função a executa diretamente.
 
 Grade inicial proposta:
@@ -119,15 +133,25 @@ usados quando permanecerem legíveis na fonte ativa.
 - `sqrt`: substitui o nível `1` por sua raiz quadrada;
 - `pow`: calcula nível `2` elevado ao nível `1`;
 - `1/x`: substitui o nível `1` por seu inverso;
-- `+/-`: troca o sinal do nível `1`;
+- `+/-`: troca o sinal da entrada pendente, sem confirmá-la, ou do nível `1`
+  quando não há entrada, assim como `_`;
 - `dup`: duplica o nível `1`;
 - `drop`: remove o nível `1`;
 - `swap`: troca os níveis `1` e `2`;
 - `clear`: esvazia a pilha após uma confirmação simples no próprio painel.
 
+Executar uma função por teclado ou mouse confirma implicitamente a entrada
+pendente antes de aplicar a função, exceto `+/-`, que atua na própria entrada.
+Por exemplo, digitar `9` e executar `sqrt` produz `3`. Cancelar a confirmação
+de `clear` preserva tanto a pilha quanto a entrada pendente.
+
 ## Erros
 
-Erros não podem modificar a pilha. O painel reserva duas linhas acima do nível
+Uma operação com erro preserva os operandos na pilha. A confirmação implícita
+de uma entrada válida ocorre antes da operação e não é desfeita se ela falhar:
+com `2` na pilha, digitar `0 /` deixa `[2, 0]`, com `0` no nível `1` e sem
+entrada pendente. Uma entrada inválida não é confirmada nem altera a pilha.
+O painel reserva duas linhas acima do nível
 `4`, seguindo a organização visual da HP 48:
 
 ```text
@@ -172,13 +196,17 @@ fora do escopo inicial.
 - navegação pela pilha e comportamento de `PICK`;
 - navegação com wrap pela grade;
 - descrição breve das funções;
-- indicação do modo visual ativo.
+- indicação do modo visual ativo;
+- atalhos de copiar e colar valores.
 
 `Esc`, `?` ou clique fora fecha a ajuda e retorna ao estado anterior.
 
 ## Visual
 
 O plugin oferece dois modos de aparência.
+
+Um toggle retangular no canto superior direito do painel alterna entre
+`Omarchy` e `Classic`. A preferência é persistida entre reinícios do Shell.
 
 ### Omarchy
 
@@ -215,8 +243,8 @@ configuração futura, pois pode ocupar espaço e expor valores.
 ## Arquitetura proposta
 
 ```text
+manifest.json
 plugin/
-  manifest.json
   BarWidget.qml
   Panel.qml
   RpnEngine.js
@@ -227,19 +255,30 @@ tests/
 - `Panel.qml` contém apresentação, teclado, mouse e modos visuais;
 - `BarWidget.qml` integra o painel à barra;
 - nenhuma operação usa `eval` ou executa comandos externos;
-- o estado pode permanecer apenas em memória no MVP.
+- pilha e entrada permanecem apenas em memória no MVP; a preferência visual é
+  persistida.
 
 A implementação deve confirmar o manifesto e os componentes disponíveis na
 versão instalada do Omarchy. Arquivos sob `/usr/share/omarchy` servem somente
 como referência e não devem ser modificados.
+
+O manifesto fica na raiz do repositório, conforme o contrato do instalador
+de plugins, e aponta para `plugin/BarWidget.qml`.
 
 ## Persistência e clipboard
 
 Persistência da pilha não pertence ao MVP. Fechar apenas o painel preserva a
 pilha durante a sessão do Omarchy Shell; reiniciar o Shell pode limpá-la.
 
-Copiar e colar valores são candidatos para a próxima etapa. Não devem atrasar o
-primeiro marco.
+Copiar e colar fazem parte do MVP:
+
+- `Ctrl+c` copia o valor do nível `1`, sem truncamento visual, usando ponto
+  decimal; não copia a entrada pendente nem o nível selecionado na navegação;
+- `Ctrl+v` interpreta o texto do clipboard como um único número finito e o
+  empilha como novo nível `1`, deslocando os anteriores; uma entrada em edição
+  mantém seu buffer e cursor, sem ser confirmada ou substituída;
+- texto inválido ou valor não finito produz erro sem alterar a pilha;
+- a preferência visual é persistida independentemente da pilha.
 
 ## Critérios de aceite do MVP
 
@@ -249,14 +288,23 @@ primeiro marco.
 - `_` troca o sinal sem conflitar com subtração;
 - `p`/`n` e `Ctrl+p`/`Ctrl+n` percorrem uma pilha com mais de quatro níveis;
 - `Enter` em stack browse executa `PICK` exatamente como especificado;
-- qualquer seta entra na grade e a navegação faz wrap nos dois eixos;
+- esquerda/direita movem o cursor durante a entrada;
+- as setas entram na grade nos destinos definidos e, dentro dela, a navegação
+  faz wrap nos dois eixos;
 - `Enter` executa a função selecionada e `Esc` volta à pilha;
 - mouse executa funções sem exigir navegação pelo teclado;
 - divisão por zero e operandos insuficientes preservam a pilha;
+- `2 Enter 0 /` preserva `[2, 0]`, com o zero confirmado no nível `1`;
+- navegar pela pilha durante a edição e cancelar retoma o buffer e o cursor;
+- `9` seguido de `sqrt` produz `3`; `+/-` durante a edição não confirma a entrada;
+- `Esc` limpa um erro antes de cancelar a entrada ou fechar o painel;
+- `Ctrl+c` copia o nível `1` sem truncamento e `Ctrl+v` cola um número finito;
 - valores aparecem alinhados à direita com ponto decimal;
 - `?` apresenta todos os atalhos do MVP;
 - os modos `Omarchy` e `Classic` são legíveis e o modo `Classic` não usa assets
   ou marcas da HP;
+- o toggle retangular no canto superior direito alterna a aparência e a escolha
+  sobrevive ao reinício do Shell;
 - abrir, usar e fechar o painel não gera erros QML nos logs do Omarchy Shell.
 
 ## Fora do escopo inicial
@@ -274,7 +322,6 @@ primeiro marco.
 ## Questões para depois do MVP
 
 - persistir a pilha entre reinícios;
-- copiar e colar com atalhos convencionais;
 - histórico de operações e undo;
 - funções trigonométricas e logarítmicas;
 - formatos inteiro, hexadecimal e científico;

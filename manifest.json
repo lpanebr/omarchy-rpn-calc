@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "lpanebr.rpn-calc",
+  "name": "RPN Calculator",
+  "version": "0.1.0",
+  "author": "lpanebr",
+  "description": "Keyboard-driven RPN calculator with an optional classic display",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "plugin/BarWidget.qml" },
+  "barWidget": {
+    "displayName": "RPN Calculator",
+    "description": "Local RPN calculator",
+    "category": "Utilities",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": { "appearance": "Omarchy" }
+  }
+}
